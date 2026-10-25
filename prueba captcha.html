@@ -1,0 +1,163 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Contáctanos</title>
+<!-- 1. Script oficial de Google reCAPTCHA -->
+<script src="https://www.google.com/recaptcha/api.js" async defer></script>
+<!-- 2. Script oficial de EmailJS -->
+<script type="text/javascript" src="https://cdn.jsdelivr.net/npm/@emailjs/browser@3/dist/email.min.js"></script>
+<script type="text/javascript">
+   (function(){
+      emailjs.init("rPuciTd9Z-S3gyT3r");
+   })();
+</script>
+
+<style>
+  body {
+    background: #f5f5f5;
+    font-family: Arial, sans-serif;
+    display: flex;
+    justify-content: center;
+    padding-top: 50px;
+  }
+  .card {
+    background: white;
+    width: 450px;
+    padding: 40px;
+    border-radius: 4px;
+    box-shadow: 0 1px 4px rgba(0,0,0,0.1);
+    border: 1px solid #e0e0e0;
+  }
+  h2 {
+    text-align: center;
+    font-weight: 500;
+    color: #2c3e50;
+    margin-bottom: 30px;
+  }
+  label {
+    font-size: 13px;
+    color: #555;
+    display: block;
+    margin-top: 20px;
+    margin-bottom: 5px;
+  }
+  input[type="text"], input[type="email"], textarea {
+    width: 100%;
+    border: none;
+    border-bottom: 1px solid #ccc;
+    padding: 8px 0;
+    outline: none;
+    font-size: 14px;
+    background: transparent;
+  }
+  input:focus, textarea:focus {
+    border-bottom: 2px solid #3b82f6;
+  }
+  textarea {
+    resize: none;
+    height: 60px;
+  }
+  .captcha-container {
+    margin-top: 35px;
+  }
+  .btn {
+    margin-top: 20px;
+    width: 100%;
+    background: #3b82f6;
+    color: white;
+    border: none;
+    padding: 12px;
+    border-radius: 4px;
+    cursor: pointer;
+    font-size: 15px;
+  }
+  .btn:hover {
+    background: #2563eb;
+  }
+</style>
+</head>
+<body>
+
+<div class="card">
+  <h2>Contáctanos</h2>
+
+  <form id="formulario">
+    <!-- El atributo 'name' es obligatorio para que EmailJS reconozca los campos -->
+    <label>Nombre</label>
+    <input type="text" id="nombre" name="nombre" required>
+
+    <label>Correo electrónico</label>
+    <input type="email" id="correo" name="correo" required>
+
+    <label>Asunto</label>
+    <input type="text" id="asunto" name="asunto" required>
+
+    <label>Mensaje</label>
+    <textarea id="mensaje" name="mensaje" required></textarea>
+
+    <!-- Widget de Google reCAPTCHA -->
+    <div class="captcha-container">
+      <div class="g-recaptcha" data-sitekey="6LeirQAuAAAAAALY8OzYo9j6emPTt4_CqvjMAKN2"></div>
+    </div>
+
+    <button class="btn" type="submit" id="enviarCorreo">Enviar</button>
+  </form>
+</div>
+
+<script>
+var formulario = document.getElementById("formulario");
+
+formulario.addEventListener("submit", function(e){
+  e.preventDefault();
+  
+  var nombre = document.getElementById("nombre").value.trim();
+  var correo = document.getElementById("correo").value.trim();
+  var asunto = document.getElementById("asunto").value.trim();
+  var mensaje = document.getElementById("mensaje").value.trim();
+
+  // 1. Validar reCAPTCHA
+  var respuestaCaptcha = grecaptcha.getResponse();
+  if (respuestaCaptcha.length === 0) {
+    alert("Por favor, confirma que no eres un robot.");
+    return;
+  }
+
+  // 2. Validar campos y longitud
+  if (nombre === "") { alert("Falta el nombre"); return; }
+  if (correo === "") { alert("Falta el correo"); return; }
+  
+  // Validación sencilla de correo (con includes)
+  if (!correo.includes("@") || !correo.includes(".")) { 
+    alert("El correo no es válido (debe tener @ y .)"); 
+    return; 
+  }
+
+  if (asunto === "") { alert("Falta el asunto"); return; }
+  if (mensaje === "") { alert("Falta el mensaje"); return; }
+  if (mensaje.length < 10) { alert("El mensaje tiene que tener al menos 10 caracteres"); return; }
+
+  // 3. Todo OK: Enviar el correo usando EmailJS
+  var enviarCorreo = document.getElementById("enviarCorreo");
+  enviarCorreo.textContent = "Enviando...";
+  enviarCorreo.disabled = true;
+
+  emailjs.sendForm('servicio patata', 'template_7ke21qf', this)
+    .then(function() {
+        alert("¡Mensaje enviado con éxito!");
+        formulario.reset(); // Limpia el formulario
+        grecaptcha.reset(); // Reinicia el reCAPTCHA
+        enviarCorreo.textContent = "Enviar";
+        enviarCorreo.disabled = false;
+    }, function(error) {
+        alert("Hubo un error al enviar el mensaje.");
+        console.error("Error:", error);
+        enviarCorreo.textContent = "Enviar";
+        enviarCorreo.disabled = false;
+    });
+});
+</script>
+
+</body>
+</html>
